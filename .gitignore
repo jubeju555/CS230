@@ -1,0 +1,9 @@
+.config/
+.gitconfig
+.local/
+.nvm/
+.oh-my-zsh/
+.pyenv/
+.ssh/
+.vscode-server/
+.zsh_history
