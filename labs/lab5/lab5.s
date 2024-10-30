@@ -9,11 +9,16 @@ new_line: .asciz "\n"
 # run ./mylab mud.rooms
 look_at_room:
     #  ...
+ld a1, 0(a0) # Load the title
+ld a2, 8(a0) # Load the description
 
+la a0, exit_string
+call printf
 
+ret
 
 printf:
-la      a0, exit_string       # Load the address of exit_string into a0
+    la      a0, exit_string       # Load the address of exit_string into a0
     ld      a1, 0(a0)             # Load the title (assuming title is at offset 0)
     ld      a2, 8(a0)             # Assuming the description field is at offset 8
     call    printf
@@ -36,9 +41,7 @@ la, a0, new_line
 
 jal ra, printf
 addi t0, t0, 1
-addi a0, t0, 1
-j   1f
-
+j   1b
 1:
 
 
