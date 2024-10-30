@@ -5,6 +5,7 @@ new_line: .asciz "\n"
 .section .text
 .global look_at_room
 
+
 # compile: riscv64-unknown-linux-gnu-g++ -o lab5 lab5.s mud.cpp
 # run ./mylab mud.rooms
 look_at_room:
