@@ -4,6 +4,8 @@ new_line: .asciz "\n"
 
 .section .text
 .global look_at_room
+.global look_at_all_rooms
+.global move_to
 
 # compile: riscv64-unknown-linux-gnu-g++ -o lab5 lab5.s mud.cpp
 # run ./lab5 mud.rooms
@@ -33,8 +35,6 @@ li t0, 0
 look_at_all_rooms:
 li t0, 0
 mv t1, a1
-
-  
 
 1:
 bge t0, t1, loop_end
