@@ -1,4 +1,4 @@
-.section .rodata
+.section .rodata 
 exit_string: .asciz "%s\n%s\nExits: "
 new_line: .asciz "\n"
 
@@ -9,60 +9,79 @@ new_line: .asciz "\n"
 
 # compile: riscv64-unknown-linux-gnu-g++ -o lab5 lab5.s mud.cpp
 # run ./lab5 mud.rooms
+
+# look_at_room function to display room details
 look_at_room:
-    #  ...
-addi sp, sp, -8
-sd ra, 0(sp)
+    addi sp, sp, -8        
+    sd ra, 0(sp)            # Save return address 
 
-ld a1, 0(a0) # Load the title
-ld a2, 8(a0) # Load the description
-la a0, exit_string
-call printf
+    ld a1, 0(a0)            #  room title
+    ld a2, 8(a0)            # room description
+    la a0, exit_string      #  format string for printf
+    call printf             #  title and description
 
-ret
+    la a0, new_line         #  newline string
+    call printf             
 
-la a0, new_line
-call printf
+    ld ra, 0(sp)            # Restore return address
+    addi sp, sp, 8          
+    ret                     
 
-li t0, 0
-
-# printf:
-#     la      a0, exit_string       # Load the address of exit_string into a0
-#     ld      a1, 0(a0)             # Load the title (assuming title is at offset 0)
-#     ld      a2, 8(a0)             # Assuming the description field is at offset 8
-#     call    printf
-
+# look_at_all_rooms function to iterate over all rooms and display each one
 look_at_all_rooms:
-li t0, 0
-mv t1, a1
+    li t0, 0                #  room counter
+    mv t1, a1               # Total number of rooms in t1
 
-1:
-bge t0, t1, loop_end
-slli t2, t0, 3
-add t3, a0, t2
+loop_rooms:
+    bge t0, t1, loop_end    # Exit loop if all rooms displayed
+    slli t2, t0, 3          #  offset for the current room
+    add t3, a0, t2          #  address of the current room
 
-mv a0, t3
-jal ra, look_at_room
+    mv a0, t3               # Set a0 to point to the current room
+    jal look_at_room        # Call look_at_room to display the room
 
-la, a0, new_line
+    la a0, new_line         # Load newline address
+    call printf             # Print newline after each room
 
-jal ra, printf
-addi t0, t0, 1
-j   1b
-1:
+    addi t0, t0, 1          # Increment room counter
+    j loop_rooms            # Repeat loop for the next room
 
+loop_end:
+    ret                     # Return from function
 
+# move_to function to navigate to a specified exit
 move_to:
-slli t0, a2, 2
-add t0, a1, t0 # t0 = t1 + t2
-lw t1, 0
+    mv a0, a1                 # Move room base address to a0 
+    la a1, exit_string        # Load format string for printing 
+    call printf               # Print room base address (a1)
 
-li ti, -1
-beq t1, t2, return_null
+    mv a0, a2                 # Move exit index to a0 for printing
+    la a1, exit_string        # Load format string for printing (optional)
+    call printf               # Print exit index (a2)
 
-slli t1, t1, 3
-add a0, a0, t1
-jr ra
+    slli t0, a2, 2            # Multiply exit index by 4 (size of int)
+    add t0, a1, t0            # Add the exit index offset to the base address of exits
+    lw t1, 0(t0)              # Load the next room ID from the exit list
 
+    # Debugging: Print the room ID (t1) loaded from the exit list
+    mv a0, t1                 # Move room ID to a0 for printing
+    la a1, exit_string        # Load format string for printing (optional)
+    call printf               # Print the room ID
 
-  
+    li t2, -1                 # Indicator for no exit
+    beq t1, t2, return_null   # If the room ID is -1, return null (no exit)
+
+    # Print the calculated room ID before jumping
+    slli t1, t1, 3            # Multiply the room ID by 8 (size of room in memory)
+    add a0, a0, t1            # Add the offset to the base address of rooms
+
+    # Debugging: Print the new room address calculated
+    mv a0, a0                 # Move the new room address to a0 for printing
+    la a1, exit_string        # Load format string for printing (optional)
+    call printf               # Print the new calculated room address
+
+    ret                       # Return with the updated address of the next room
+
+return_null:
+    li a0, 0                  # Return null (0) if no exit found
+    ret                       # Return from function
