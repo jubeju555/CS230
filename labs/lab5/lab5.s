@@ -52,27 +52,18 @@ loop_end:
 # move_to function to navigate to a specified exit
 move_to:
     mv a0, a1                 # Move room base address to a0 
-    la a1, exit_string        # Load format string for printing 
-    call printf               # Print room base address (a1)
-
-    mv a0, a2                 # Move exit index to a0 for printing
-    la a1, exit_string        # Load format string for printing (optional)
-    call printf               # Print exit index (a2)
 
     slli t0, a2, 2            # Multiply exit index by 4 (size of int)
     add t0, a1, t0            # Add the exit index offset to the base address of exits
     lw t1, 0(t0)              # Load the next room ID from the exit list
 
-    # Debugging: Print the room ID (t1) loaded from the exit list
     mv a0, t1                 # Move room ID to a0 for printing
     la a1, exit_string        # Load format string for printing (optional)
     call printf               # Print the room ID
 
     li t2, -1                 # Indicator for no exit
     beq t1, t2, return_null   # If the room ID is -1, return null (no exit)
-
-    # Print the calculated room ID before jumping
-    slli t1, t1, 3            # Multiply the room ID by 8 (size of room in memory)
+    mv a0, t1                 # Move room ID to a0
     add a0, a0, t1            # Add the offset to the base address of rooms
 
     # Debugging: Print the new room address calculated
@@ -83,5 +74,6 @@ move_to:
     ret                       # Return with the updated address of the next room
 
 return_null:
-    li a0, 0                  # Return null (0) if no exit found
-    ret                       # Return from function
+    # Calculate the new room address
+    slli t1, t1, 3            # Multiply the room ID by 8 (size of room in memory)
+    add a0, a0, t1            # Add the offset to the base address of rooms
