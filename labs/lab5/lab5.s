@@ -5,61 +5,61 @@ north: .asciz "n "
 south: .asciz "s "
 east: .asciz "e "
 west: .asciz "w "
-
 .section .text
 .global look_at_room
 .global look_at_all_rooms
 .global move_to
-
 # compile: riscv64-unknown-linux-gnu-g++ -o lab5 lab5.s mud.cpp
 # run ./lab5 mud.rooms
 
 # look_at_room function to display room details
 look_at_room:
     addi sp, sp, -16         # Allocate space on the stack
-    sd ra, 0(sp)            # Save return address on the stack
-    ld a1, 0(s0)            # Load the room title
-    ld a2, 8(s0)            # Load the room description
-    mv s0, a0 
+    sd ra, 0(sp)             # Save return address on the stack
+    sd s0, 8(sp)             # Save s0 on the stack
+    mv s0, a0                # Save a0 to s0
 
-    la a0, exit_string      # Load format string for printf
-    call printf             # Print title and description
-    
-    lw a2, 16(s0)           # Load the exits
+    ld a1, 0(s0)             # Load the room title
+    ld a2, 8(s0)             # Load the room description
+
+    la a0, exit_string       # Load format string for printf
+    call printf              # Print title and description
+
+    lw a2, 16(s0)            # Load the exits
     li a1, -1                # Initialize exit index
     beq a1, a2, n
-    la a0, north            # Load exit string for north
-    call printf             # Print exit string for north
-    n:
+    la a0, north             # Load exit string for north
+    call printf              # Print exit string for north
+n:
 
-     lw a2, 20(s0)           # Load the exits
+    lw a2, 20(s0)            # Load the exits
     li a1, -1                # Initialize exit index
-    beq a1,a2, s              # Check if exits are available
-    la a0, south            # Load exit string for south
-    call printf             # Print exit string for south
-    s:
+    beq a1, a2, s            # Check if exits are available
+    la a0, south             # Load exit string for south
+    call printf              # Print exit string for south
+s:
 
-     lw a2, 24(s0)           # Load the exits
+    lw a2, 24(s0)            # Load the exits
     li a1, -1                # Initialize exit index
-    beq a1, a2, e              # Check if exits are available
-    la a0, east             # Load exit string for east
-    call printf             # Print exit string for east
-    e:
+    beq a1, a2, e            # Check if exits are available
+    la a0, east              # Load exit string for east
+    call printf              # Print exit string for east
+e:
 
-     lw a2, 16(s0)           # Load the exits
+    lw a2, 28(s0)            # Load the exits
     li a1, -1                # Initialize exit index
-    beq a1,a2, w              # Check if exits are available
-    la a0, west             # Load exit string for west
-    call printf             # Print exit string for west
-    w:
+    beq a1, a2, w            # Check if exits are available
+    la a0, west              # Load exit string for west
+    call printf              # Print exit string for west
+w:
 
-    la a0, new_line         # Load newline string
-    call printf             # Print newline
+    la a0, new_line          # Load newline string
+    call printf              # Print newline
 
-    ld ra, 0(sp)            # Restore return address
-    sd a2, 8(sp)            # Save room description on the stack
+    ld ra, 0(sp)             # Restore return address
+    ld s0, 8(sp)             # Restore s0
     addi sp, sp, 16          # Deallocate stack space
-    ret                     # Return from function
+    ret                      # Return from function
 
 # look_at_all_rooms function to iterate over all rooms and display each one
 look_at_all_rooms:
