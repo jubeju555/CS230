@@ -9,6 +9,10 @@ west: .asciz "w "
 .global look_at_room
 .global look_at_all_rooms
 .global move_to
+# judah benjamin
+# mud lab
+# jbenjam7
+# room based dungeon crawler
 # compile: riscv64-unknown-linux-gnu-g++ -o lab5 lab5.s mud.cpp
 # run ./lab5 mud.rooms
 
