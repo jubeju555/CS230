@@ -77,3 +77,6 @@ int main(int argc, char *argv[]) {
 
         return 0;
 }
+
+
+// needs to search through array and  match key, if mmatches return index where key was found, if not return num_values - in riscv assembly, 
